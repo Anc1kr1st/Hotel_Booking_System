@@ -5,6 +5,7 @@ df_cards = (pandas.read_csv("cards.csv", dtype=str).
             to_dict(orient="records"))
 df_cards_security = pandas.read_csv("card_security.csv", dtype=str)
 
+
 class Hotel:
     def __init__(self, hotel_id):
         self.hotel_id = hotel_id
@@ -24,6 +25,11 @@ class Hotel:
             return False
 
 
+class SpaHotel(Hotel):
+    def spa_package(self):
+        pass
+
+
 class ReservationTicket:
     def __init__(self, customer_name, hotel_object):
         self.customer_name = customer_name
@@ -40,9 +46,24 @@ class ReservationTicket:
         return content
 
 
+class SpaReservationTicket:
+    def __init__(self, customer_name, hotel_object):
+        self.customer_name = customer_name
+        self.hotel = hotel_object
+
+    def generate(self):
+        content = f"""
+        Thank you for your SPA reservation!
+        Here are your booking data:
+        Name: {self.customer_name}
+        Hotel name: {self.hotel.name}
+        """
+
+        return content
+
+
 class CreditCard:
     def __init__(self, number):
-        # Ak to chcem pouzit v inej classe
         self.number = number
     def validate(self, expiration, holder, cvc):
         card_data = {"number": self.number, "expiration": expiration,
@@ -64,7 +85,7 @@ class SecureCreditCard(CreditCard):
 
 print(df)
 hotel_ID = input("Enter the id of the hotel: ")
-hotel = Hotel(hotel_ID)
+hotel = SpaHotel(hotel_ID)
 
 if hotel.available():
     credit_card = SecureCreditCard(number="1234567890123456")
@@ -75,6 +96,11 @@ if hotel.available():
             name = input("Enter your name: ")
             reservation_ticket = ReservationTicket(customer_name=name, hotel_object=hotel)
             print(reservation_ticket.generate())
+            spa = input("Do you want to book a spa package?")
+            if spa == "yes":
+                hotel.spa_package()
+                spa_ticket = SpaReservationTicket(customer_name=name, hotel_object=hotel)
+                print(spa_ticket.generate())
         else:
             print("Credit card authentication failed.")
     else:
